@@ -108,3 +108,4 @@ button { font-family: inherit; }
 .step-img { width: 110px; margin: -4px auto 6px; }
 
 .seed .seedno { display: inline-block; font-size: 13px; font-weight: 700; color: #fff; background: var(--orange); border-radius: 12px; padding: 2px 12px; margin-bottom: 8px; }
+.mini-note { font-size: 13px; opacity: .85; margin: 10px 4px 0; }

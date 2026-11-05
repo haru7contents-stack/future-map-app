@@ -176,6 +176,10 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
         <div className="row"><span className="no">02</span><div><b>届けたい人</b><p>{r.target}<br />いちばんの困りごと：{r.trouble}</p></div></div>
         <div className="row"><span className="no">05</span><div><b>私だから入れられる経験</b><p>{r.strength}</p></div></div>
       </section>
+      <p className="mini-note">
+        ※これは選ぶだけの「ミニ版」です。教材の中の本物の商品カルテでは、AIがあなたに質問しながら、
+        あなた自身の言葉で01〜08の8項目を仕上げていきます。
+      </p>
 
       <h2 className="sec">🌱 あなたの商品のタネ</h2>
       <p className="hint">たとえば、こんな商品が作れます。あなたの経験に近いものを、思い浮かべながら読んでみてください。</p>
@@ -211,6 +215,10 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
         <h3>このタネを、本命の商品にするまで</h3>
         <div className="step"><span>1</span><p>まずは教材で、再販権つきの商品を使って「作って売る」流れをひと通り経験する</p></div>
         <div className="step"><span>2</span><p>その経験と、あなたのタネを組み合わせて、本命の商品へ</p></div>
+        <p className="nexttext">
+          教材の中では、AIがあなたに質問しながら「私の商品カルテ」を作ります。
+          選択肢ではなくあなた自身の言葉で書くので、ここに出たタネも、もっと「あなただけの商品」に近づいていきます。
+        </p>
         <p className="nexttext">
           いきなり本命から作ると、売り方が分からずに止まってしまいがち。
           先に「作って売る」を1回経験しておくと、2つ目からは迷いが減ります。
