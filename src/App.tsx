@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Answers, OTHER_MAX, QUESTIONS, TEST_PATTERNS, emptyAnswers } from './questions'
 import { generate } from './generate'
 import { canvasToBlob, renderCard, saveBlob } from './card'
+import type { Seed } from './seeds'
 
 const NOTE_URL = 'https://note.com/haru7contents/n/n8b9f0244629b'
 const THREADS_URL = 'https://www.threads.com/@haru7_contents'
@@ -182,21 +183,19 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
       </p>
 
       <h2 className="sec">🌱 あなたの商品のタネ</h2>
-      <p className="hint">たとえば、こんな商品が作れます。あなたの経験に近いものを、思い浮かべながら読んでみてください。</p>
+      <p className="hint">たとえば、こんな商品が作れます。立場のちがう例を3つ出しているので、あなたに近いものを思い浮かべながら読んでみてください。</p>
+      {r.mainLabel && <p className="seedgroup">「{r.mainLabel}」の経験から</p>}
       {r.seeds.map((s, i) => (
-        <article className="seed" key={i}>
-          <span className="seedno">タネの例{'①②③'[i]}</span>
-          <h3>{s.title}</h3>
-          <dl>
-            <dt>どんな商品？</dt><dd>{s.what}</dd>
-            <dt>こんな人が探しています</dt><dd>{s.who}</dd>
-            <dt>お金を払ってでも欲しい理由</dt><dd>{s.why}</dd>
-            <dt>中身の例</dt><dd>{s.inside}</dd>
-            <dt>あなただから入れられること</dt><dd>{s.you}</dd>
-          </dl>
-          {s.note && <p className="seednote">※{s.note}</p>}
-        </article>
+        <SeedCard key={i} s={s} tag={`タネの例${'①②③'[i]}`} />
       ))}
+      {r.extra.length > 0 && (
+        <>
+          <h2 className="sec">ほかの経験から生まれるタネ</h2>
+          {r.extra.map((e, i) => (
+            <SeedCard key={i} s={e.seed} tag={`「${e.label}」の経験から`} />
+          ))}
+        </>
+      )}
 
       <section className="why">
         <h3>お金を払ってでも「欲しい」と思われる、3つの理由</h3>
@@ -251,5 +250,22 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
         </div>
       )}
     </main>
+  )
+}
+
+function SeedCard({ s, tag }: { s: Seed; tag: string }) {
+  return (
+    <article className="seed">
+      <span className="seedno">{tag}</span>
+      <h3>{s.title}</h3>
+      <dl>
+        <dt>どんな商品？</dt><dd>{s.what}</dd>
+        <dt>こんな人が探しています</dt><dd>{s.who}</dd>
+        <dt>お金を払ってでも欲しい理由</dt><dd>{s.why}</dd>
+        <dt>中身の例</dt><dd>{s.inside}</dd>
+        <dt>あなただから入れられること</dt><dd>{s.you}</dd>
+      </dl>
+      {s.note && <p className="seednote">※{s.note}</p>}
+    </article>
   )
 }

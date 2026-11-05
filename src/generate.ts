@@ -8,6 +8,8 @@ export type Result = {
   trouble: string // いちばんの困りごと
   strength: string // 05 私だから入れられる経験
   seeds: Seed[]
+  mainLabel: string
+  extra: { label: string; seed: Seed }[]
   pace: string
 }
 
@@ -42,10 +44,11 @@ export function generate(a: Answers): Result {
     ? `${base}と、まわりから頼まれる「${skill}」の力`
     : `${base}そのもの。あなたにとって当たり前のことが、誰かの知りたいことです`
 
-  let seeds: Seed[]
-  if (exp.length === 0) seeds = SEEDS.none
-  else if (exp.length === 1) seeds = SEEDS[exp[0]]
-  else seeds = [...SEEDS[exp[0]], SEEDS[exp[1]][0]]
+  // いちばん自信のある経験からは3つ（立場のちがう例を入れて、どれかに当てはまるように）
+  const seeds: Seed[] = exp.length ? SEEDS[exp[0]] : SEEDS.none
+  const mainLabel = expLabels[0] ?? ''
+  // 2つ目・3つ目に選んだ経験からは1つずつ
+  const extra = exp.slice(1).map((id, i) => ({ label: expLabels[i + 1], seed: SEEDS[id][0] }))
 
-  return { me, meShort, target, trouble, strength, seeds, pace: PACE[a.q6 ?? ''] ?? PACE.H_Q }
+  return { me, meShort, target, trouble, strength, seeds, mainLabel, extra, pace: PACE[a.q6 ?? ''] ?? PACE.H_Q }
 }

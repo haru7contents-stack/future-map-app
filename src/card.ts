@@ -115,18 +115,18 @@ export async function renderCard(r: Result, scale = 1): Promise<HTMLCanvasElemen
   g.fillStyle = C.brown
   g.fillText('🌱 あなたの商品のタネ', X + 36, top + 30)
   let seeds = r.seeds.slice(0, 3)
-  g.font = `700 36px ${FONT}`
+  g.font = `700 31px ${FONT}`
   const height = (list: typeof seeds) =>
-    list.reduce((a, s) => a + Math.min(wrap(g, s.title, IW - 120).length, 2) * 50, 0) + (list.length - 1) * 26
-  while (seeds.length > 1 && height(seeds) > bottom - top - 120) seeds = seeds.slice(0, -1)
+    list.reduce((a, s) => a + Math.min(wrap(g, s.title, IW - 120).length, 2) * 43, 0) + (list.length - 1) * 18
+  while (seeds.length > 1 && height(seeds) > bottom - top - 105) seeds = seeds.slice(0, -1)
   const total = height(seeds)
-  let sy = top + 90 + Math.max(0, (bottom - top - 110 - total) / 2)
+  let sy = top + 84 + Math.max(0, (bottom - top - 104 - total) / 2)
   seeds.forEach((s, i) => {
     g.fillStyle = C.sage
     g.beginPath()
-    g.arc(X + 50, sy + 20, 9, 0, Math.PI * 2)
+    g.arc(X + 50, sy + 17, 8, 0, Math.PI * 2)
     g.fill()
-    sy = para(g, s.title, X + 76, sy, IW - 120, 36, 50, 700, C.brown, 2) + 26
+    sy = para(g, s.title, X + 76, sy, IW - 120, 31, 43, 700, C.brown, 2) + 18
     void i
   })
 
