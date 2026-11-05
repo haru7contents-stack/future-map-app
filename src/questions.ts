@@ -1,8 +1,9 @@
-export type Option = { id: string; label: string; other?: boolean; exclusive?: boolean }
+export type Option = { id: string; label: string; short?: string; other?: boolean; exclusive?: boolean }
+export type QKey = 'q1' | 'q2' | 'q3' | 'q4' | 'q5' | 'q6'
 export type Question = {
-  key: 'q1' | 'q2' | 'q3' | 'q4' | 'q5'
+  key: QKey
   title: string
-  multi?: boolean
+  multi?: number // 複数選択の上限
   hint?: string
   options: Option[]
 }
@@ -10,104 +11,107 @@ export type Question = {
 export const QUESTIONS: Question[] = [
   {
     key: 'q1',
-    title: '今、あなたが一番変えたいことは何ですか？',
+    title: '今のあなたの毎日に、いちばん近いのは？',
     options: [
-      { id: 'Q1_A', label: '自分の収入を増やしたい' },
-      { id: 'Q1_B', label: '家族との時間を大切にしながら、自分の仕事も持ちたい' },
-      { id: 'Q1_C', label: '今の仕事とは違う、新しい働き方を見つけたい' },
-      { id: 'Q1_D', label: '自分の好きなことや得意なことを活かしたい' },
-      { id: 'Q1_E', label: '今はわからないけれど、これからの人生を少し変えたい' },
-      { id: 'Q1_F', label: 'その他', other: true },
+      { id: 'D_KIDS', label: '子育て中', short: '子育て中' },
+      { id: 'D_CARE', label: '子育てや仕事に加えて、親のケアもしている', short: '親のケアもしている' },
+      { id: 'D_PART', label: 'パート・アルバイトをしている', short: 'パート・アルバイト中' },
+      { id: 'D_WORK', label: '会社員・契約社員として働いている', short: '会社で働いている' },
+      { id: 'D_HOME', label: '専業主婦で、今は仕事をしていない', short: '専業主婦' },
+      { id: 'D_OTHER', label: 'その他', other: true },
     ],
   },
   {
     key: 'q2',
-    title: '今、あなたはどのような働き方をしていますか？',
+    title: 'これまでの経験で、当てはまるものは？',
+    multi: 3,
+    hint: '3つまで選べます。いちばん自信のあるものから選んでください',
     options: [
-      { id: 'Q2_A', label: '専業主婦で、今は仕事をしていない' },
-      { id: 'Q2_B', label: 'パート・アルバイトをしている' },
-      { id: 'Q2_C', label: '正社員・契約社員として働いている' },
-      { id: 'Q2_D', label: '在宅ワーク・フリーランスをしている' },
-      { id: 'Q2_E', label: '家族のケアなどで、今は働くことが難しい' },
-      { id: 'Q2_F', label: 'その他', other: true },
+      { id: 'kids', label: '子育て' },
+      { id: 'care', label: '親のケア・介護' },
+      { id: 'nurse', label: '看護・医療・福祉の仕事' },
+      { id: 'edu', label: '保育・教育の仕事' },
+      { id: 'office', label: '事務・経理の仕事' },
+      { id: 'shop', label: '接客・販売の仕事' },
+      { id: 'beauty', label: '美容・ファッション' },
+      { id: 'cook', label: '料理・家事の工夫' },
+      { id: 'design', label: 'デザイン・ものづくり' },
+      { id: 'hobby', label: '続けている趣味・習いごと' },
+      { id: 'change', label: '転職・ブランク・移住など、働き方や暮らしを変えた経験' },
+      { id: 'none', label: 'この中にはない', exclusive: true },
     ],
   },
   {
     key: 'q3',
-    title: 'あなたが得意なことや、好きなことは何ですか？',
-    multi: true,
-    hint: '当てはまるものをいくつでも選べます',
+    title: 'まわりから、よく頼まれたり聞かれたりすることは？',
     options: [
-      { id: 'Q3_A', label: '文章を書いたり、人に何かを伝えること' },
-      { id: 'Q3_B', label: 'デザインやものづくり' },
-      { id: 'Q3_C', label: '人の相談に乗ったり、誰かをサポートすること' },
-      { id: 'Q3_D', label: '情報を調べたり、わかりやすくまとめること' },
-      { id: 'Q3_E', label: '家事・育児・暮らしの工夫' },
-      { id: 'Q3_F', label: 'パソコンやSNSを使った作業' },
-      { id: 'Q3_G', label: 'まだ自分の得意なことがわからない', exclusive: true },
-      { id: 'Q3_H', label: 'その他', other: true },
+      { id: 'S_PLAN', label: '段取りや整理', short: '段取りや整理' },
+      { id: 'S_RESEARCH', label: '調べて、分かりやすくまとめること', short: '調べてまとめること' },
+      { id: 'S_LISTEN', label: '話を聞く・相談に乗ること', short: '話を聞くこと' },
+      { id: 'S_MAKE', label: '見た目を整える・作ること', short: '見た目を整えること' },
+      { id: 'S_TEACH', label: 'やり方を教えること', short: 'やり方を教えること' },
+      { id: 'S_NONE', label: '特に思いつかない（大丈夫です）' },
     ],
   },
   {
     key: 'q4',
-    title: '新しい収入づくりのために、1週間でどのくらいの時間を使えそうですか？',
+    title: 'どんな人の役に立ちたいですか？',
     options: [
-      { id: 'Q4_A', label: '週に1時間未満' },
-      { id: 'Q4_B', label: '週に1〜3時間' },
-      { id: 'Q4_C', label: '週に3〜5時間' },
-      { id: 'Q4_D', label: '週に5〜10時間' },
-      { id: 'Q4_E', label: '週に10時間以上' },
-      { id: 'Q4_F', label: '日によって違うので、まだわからない' },
+      { id: 'T_PAST', label: '少し前の自分と、同じ立場の人', short: '少し前の自分と同じ立場の人' },
+      { id: 'T_AGE', label: '同じ年代の女性', short: '同じ年代の女性' },
+      { id: 'T_MAMA', label: '子育て中のママ・パパ', short: '子育て中のママ・パパ' },
+      { id: 'T_PARENT', label: '親のことが気になり始めた人', short: '親のことが気になり始めた人' },
+      { id: 'T_PRO', label: '同じ仕事をしている人・その後輩', short: '同じ仕事をしている人' },
+      { id: 'T_START', label: '新しいことを始めたい人', short: '新しいことを始めたい人' },
     ],
   },
   {
     key: 'q5',
-    title: 'これからの収入づくりで、あなたが一番やってみたいことは何ですか？',
+    title: 'その人が、いちばん困っていそうなことは？',
     options: [
-      { id: 'Q5_A', label: '自分の経験や得意なことを活かして、商品を作ってみたい' },
-      { id: 'Q5_B', label: 'パソコンやAIを使って、新しい仕事に挑戦したい' },
-      { id: 'Q5_C', label: 'すでにある商品を活用して、販売を始めてみたい' },
-      { id: 'Q5_D', label: '自分のスキルを活かして、今の仕事以外の依頼も受けてみたい' },
-      { id: 'Q5_E', label: 'まだわからないので、いろいろな可能性を知りたい' },
-      { id: 'Q5_F', label: 'その他', other: true },
+      { id: 'P_WHERE', label: '何から始めればいいか分からない', short: '何から始めればいいか分からない' },
+      { id: 'P_TIME', label: '時間がない', short: '時間がない' },
+      { id: 'P_INFO', label: '情報が多すぎて迷っている', short: '情報が多すぎて迷っている' },
+      { id: 'P_ALONE', label: 'ひとりで抱えていて不安', short: 'ひとりで抱えていて不安' },
+      { id: 'P_FAIL', label: '失敗したくない', short: '失敗したくない' },
+    ],
+  },
+  {
+    key: 'q6',
+    title: '商品づくりに、1週間でどのくらい時間を使えそうですか？',
+    options: [
+      { id: 'H_1', label: '週に1時間未満' },
+      { id: 'H_3', label: '週に1〜3時間' },
+      { id: 'H_5', label: '週に3〜5時間' },
+      { id: 'H_10', label: '週に5時間以上' },
+      { id: 'H_Q', label: '日によって違うので、まだ分からない' },
     ],
   },
 ]
 
 export type Answers = {
   q1?: string
-  q2?: string
-  q3: string[]
+  q2: string[] // 選んだ順
+  q3?: string
   q4?: string
   q5?: string
-  other: { q1: string; q2: string; q3: string; q5: string }
+  q6?: string
+  otherQ1: string
 }
 
-export const emptyAnswers = (): Answers => ({
-  q3: [],
-  other: { q1: '', q2: '', q3: '', q5: '' },
-})
-
-export const SAMPLE_ANSWERS: Answers = {
-  q1: 'Q1_A',
-  q2: 'Q2_D',
-  q3: ['Q3_B'],
-  q4: 'Q4_D',
-  q5: 'Q5_B',
-  other: { q1: '', q2: '', q3: '', q5: '' },
-}
+export const emptyAnswers = (): Answers => ({ q2: [], otherQ1: '' })
 
 export const OTHER_MAX = 20
 export const cleanOther = (s: string) =>
   s.replace(/[\u0000-\u001f\u007f]/g, '').trim().slice(0, OTHER_MAX)
 
-const o = (q1 = '', q2 = '', q3 = '', q5 = '') => ({ q1, q2, q3, q5 })
-// 動作確認用の回答パターン（?sample=1〜6 で表示）
+export const label = (key: QKey, id?: string) =>
+  QUESTIONS.find((q) => q.key === key)?.options.find((o) => o.id === id)
+
+// 動作確認用（?sample=1〜4）
 export const TEST_PATTERNS: Answers[] = [
-  SAMPLE_ANSWERS,
-  { q1: 'Q1_B', q2: 'Q2_E', q3: ['Q3_A', 'Q3_D', 'Q3_E'], q4: 'Q4_A', q5: 'Q5_C', other: o() },
-  { q1: 'Q1_E', q2: 'Q2_A', q3: ['Q3_G'], q4: 'Q4_F', q5: 'Q5_E', other: o() },
-  { q1: 'Q1_D', q2: 'Q2_C', q3: ['Q3_C', 'Q3_F'], q4: 'Q4_E', q5: 'Q5_D', other: o() },
-  { q1: 'Q1_F', q2: 'Q2_F', q3: ['Q3_B', 'Q3_H'], q4: 'Q4_C', q5: 'Q5_F', other: o('とても長い自由入力のテストですよ', 'これも長い長い働き方の入力です', 'ものすごく長い好きなことの入力', '長い長いやりたいことの入力テスト') },
-  { q1: 'Q1_C', q2: 'Q2_B', q3: ['Q3_A'], q4: 'Q4_B', q5: 'Q5_A', other: o() },
+  { q1: 'D_KIDS', q2: ['nurse', 'kids'], q3: 'S_LISTEN', q4: 'T_PRO', q5: 'P_TIME', q6: 'H_3', otherQ1: '' },
+  { q1: 'D_CARE', q2: ['care'], q3: 'S_PLAN', q4: 'T_PARENT', q5: 'P_WHERE', q6: 'H_1', otherQ1: '' },
+  { q1: 'D_HOME', q2: ['none'], q3: 'S_NONE', q4: 'T_START', q5: 'P_ALONE', q6: 'H_Q', otherQ1: '' },
+  { q1: 'D_OTHER', q2: ['design', 'hobby', 'change'], q3: 'S_MAKE', q4: 'T_AGE', q5: 'P_INFO', q6: 'H_10', otherQ1: 'フリーランスのイラストレーター' },
 ]

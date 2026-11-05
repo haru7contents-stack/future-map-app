@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Answers, OTHER_MAX, QUESTIONS, TEST_PATTERNS, emptyAnswers } from './questions'
 import { generate } from './generate'
-import { Item, buildItems, measure } from './layout'
-import { canvasToBlob, loadFonts, makePdfBlob, renderCanvas, saveBlob } from './exportMap'
-import MapView from './MapView'
+import { canvasToBlob, renderCard, saveBlob } from './card'
 
-const IG_URL = 'https://www.instagram.com/haru7_contents/'
+const NOTE_URL = 'https://note.com/haru7contents/n/n8b9f0244629b'
+const THREADS_URL = 'https://www.threads.com/@haru7_contents'
 
 type Screen = 'start' | number | 'result'
 
@@ -26,9 +25,7 @@ export default function App() {
   return (
     <div className="app">
       {screen === 'start' && <Start onStart={() => setScreen(0)} />}
-      {typeof screen === 'number' && (
-        <Ask idx={screen} ans={ans} setAns={setAns} go={setScreen} />
-      )}
+      {typeof screen === 'number' && <Ask idx={screen} ans={ans} setAns={setAns} go={setScreen} />}
       {screen === 'result' && <Result ans={ans} onRestart={restart} />}
     </div>
   )
@@ -37,22 +34,23 @@ export default function App() {
 function Start({ onStart }: { onStart: () => void }) {
   return (
     <main className="card start">
-      <h1>これからの私、どうする？ AI</h1>
-      <p className="by">by haru7_contents</p>
+      <p className="eyebrow">「私に売れるものなんてない」と思っている人へ</p>
+      <h1>私の商品のタネ診断</h1>
+      <p className="by">by ハル（haru7_contents）</p>
       <p className="lead">
-        5つの質問に答えるだけで、あなたの未来チートマップが完成します。
+        6つの質問に答えると、あなたの経験から生まれる「商品のタネ」と、
+        それを探している人の姿が見えてきます。
         <br />
         <br />
-        家事・育児・親のこと、仕事。
-        <br />
-        今の暮らしに合わせた新しい働き方や収入づくりの選択肢を、一緒に見つけましょう。
+        すごい実績や資格がなくても大丈夫。
+        あなたにとって当たり前の経験が、誰かにとっては「知りたかったこと」かもしれません。
       </p>
       <ul className="notes">
-        <li>所要時間の目安：3〜5分</li>
-        <li>質問は一つずつ</li>
-        <li>完成したマップは画像・PDFで保存できます</li>
+        <li>選ぶだけ・約2分</li>
+        <li>結果は「私の商品カルテ（ミニ版）」として画像で保存できます</li>
+        <li>ログイン不要・無料</li>
       </ul>
-      <button className="primary" onClick={onStart}>無料で始める</button>
+      <button className="primary" onClick={onStart}>無料で診断する</button>
       <p className="small">入力した内容はこの端末の中だけで使われ、外部には送信されません。</p>
     </main>
   )
@@ -60,12 +58,10 @@ function Start({ onStart }: { onStart: () => void }) {
 
 function Ask({ idx, ans, setAns, go }: { idx: number; ans: Answers; setAns: (a: Answers) => void; go: (s: Screen) => void }) {
   const q = QUESTIONS[idx]
-  const otherKey = q.key as 'q1' | 'q2' | 'q3' | 'q5'
-  const selected: string[] = q.key === 'q3' ? ans.q3 : ans[q.key] ? [ans[q.key] as string] : []
-  const otherId = q.options.find((o) => o.other)?.id
-  const otherSelected = otherId ? selected.includes(otherId) : false
-  const otherText = q.key === 'q4' ? '' : ans.other[otherKey]
-  const answered = selected.length > 0 && (!otherSelected || otherText.trim().length > 0)
+  const selected: string[] = q.key === 'q2' ? ans.q2 : ans[q.key] ? [ans[q.key] as string] : []
+  const otherOn = q.key === 'q1' && ans.q1 === 'D_OTHER'
+  const answered = selected.length > 0 && (!otherOn || ans.otherQ1.trim().length > 0)
+  const full = q.multi ? selected.length >= q.multi : false
 
   const pick = (id: string) => {
     if (q.multi) {
@@ -73,8 +69,12 @@ function Ask({ idx, ans, setAns, go }: { idx: number; ans: Answers; setAns: (a: 
       let next: string[]
       if (selected.includes(id)) next = selected.filter((s) => s !== id)
       else if (opt.exclusive) next = [id]
-      else next = [...selected.filter((s) => !q.options.find((o) => o.id === s)?.exclusive), id]
-      setAns({ ...ans, q3: next })
+      else {
+        const base = selected.filter((s) => !q.options.find((o) => o.id === s)?.exclusive)
+        if (base.length >= q.multi) return
+        next = [...base, id]
+      }
+      setAns({ ...ans, q2: next })
     } else {
       setAns({ ...ans, [q.key]: id })
     }
@@ -98,15 +98,17 @@ function Ask({ idx, ans, setAns, go }: { idx: number; ans: Answers; setAns: (a: 
       <div className="options" role={q.multi ? 'group' : 'radiogroup'}>
         {q.options.map((o) => {
           const on = selected.includes(o.id)
+          const order = q.multi && on ? selected.indexOf(o.id) + 1 : 0
+          const dim = full && !on && !o.exclusive
           return (
             <div key={o.id}>
               <button
                 type="button"
-                className={`opt${on ? ' on' : ''}`}
+                className={`opt${on ? ' on' : ''}${dim ? ' dim' : ''}`}
                 aria-pressed={on}
                 onClick={() => pick(o.id)}
               >
-                <span className="mark">{on ? '✓' : ''}</span>
+                <span className="mark">{on ? (order && !o.exclusive ? order : '✓') : ''}</span>
                 {o.label}
               </button>
               {o.other && on && (
@@ -114,9 +116,9 @@ function Ask({ idx, ans, setAns, go }: { idx: number; ans: Answers; setAns: (a: 
                   className="other"
                   type="text"
                   maxLength={OTHER_MAX}
-                  value={otherText}
+                  value={ans.otherQ1}
                   placeholder={`自由に入力（${OTHER_MAX}文字まで）`}
-                  onChange={(e) => setAns({ ...ans, other: { ...ans.other, [otherKey]: e.target.value } })}
+                  onChange={(e) => setAns({ ...ans, otherQ1: e.target.value })}
                 />
               )}
             </div>
@@ -126,7 +128,7 @@ function Ask({ idx, ans, setAns, go }: { idx: number; ans: Answers; setAns: (a: 
       <div className="nav">
         <button className="ghost" onClick={back}>戻る</button>
         <button className="primary" disabled={!answered} onClick={next}>
-          {last ? '未来チートマップを作る' : '次へ'}
+          {last ? '診断結果を見る' : '次へ'}
         </button>
       </div>
     </main>
@@ -134,76 +136,100 @@ function Ask({ idx, ans, setAns, go }: { idx: number; ans: Answers; setAns: (a: 
 }
 
 function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
-  const result = useMemo(() => generate(ans), [ans])
-  const [items, setItems] = useState<Item[] | null>(null)
-  const [busy, setBusy] = useState<string>('')
-  const [preview, setPreview] = useState<string>('')
+  const r = useMemo(() => generate(ans), [ans])
+  const [img, setImg] = useState('')
+  const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
+  const [preview, setPreview] = useState(false)
 
   useEffect(() => {
     let alive = true
-    ;(async () => {
-      await loadFonts(buildItems(result, measure))
-      if (alive) setItems(buildItems(result, measure))
-    })()
+    renderCard(r, 1).then((c) => alive && setImg(c.toDataURL('image/png')))
     return () => { alive = false }
-  }, [result])
+  }, [r])
 
-  const savePng = async () => {
-    if (!items) return
-    setBusy('png'); setMsg('')
+  const save = async () => {
+    setBusy(true); setMsg('')
     try {
-      const c = await renderCanvas(items, 2)
-      const blob = await canvasToBlob(c)
-      const r = await saveBlob(blob, 'mirai-cheat-map.png')
-      setMsg(r === 'shared' ? '' : '画像を保存しました（ダウンロードフォルダをご確認ください）')
-    } catch { setMsg('保存に失敗しました。下の「保存できないときは」をお試しください。') }
-    setBusy('')
-  }
-  const savePdf = async () => {
-    if (!items) return
-    setBusy('pdf'); setMsg('')
-    try {
-      const c = await renderCanvas(items, 2)
-      const blob = await makePdfBlob(c)
-      const r = await saveBlob(blob, 'mirai-cheat-map.pdf')
-      setMsg(r === 'shared' ? '' : 'PDFを保存しました（ダウンロードフォルダをご確認ください）')
-    } catch { setMsg('保存に失敗しました。下の「保存できないときは」をお試しください。') }
-    setBusy('')
-  }
-  const showImage = async () => {
-    if (!items) return
-    const c = await renderCanvas(items, 2)
-    setPreview(c.toDataURL('image/png'))
+      const c = await renderCard(r, 2)
+      const res = await saveBlob(await canvasToBlob(c), 'shohin-karte.png')
+      setMsg(res === 'shared' ? '' : '画像を保存しました（ダウンロードフォルダをご確認ください）')
+    } catch {
+      setMsg('保存に失敗しました。下の「保存できないときは」をお試しください。')
+    }
+    setBusy(false)
   }
 
   return (
     <main className="result">
-      <h2 className="done">未来チートマップが完成しました</h2>
-      <div className="mapwrap">
-        {items ? <MapView items={items} /> : <p className="loading">マップを作っています…</p>}
-      </div>
+      <h2 className="done">あなたの商品カルテ（ミニ版）ができました</h2>
+
+      <section className="karte">
+        <div className="row"><span className="no">01</span><div><b>私はこんな人</b><p>{r.me}</p></div></div>
+        <div className="row"><span className="no">02</span><div><b>届けたい人</b><p>{r.target}<br />いちばんの困りごと：{r.trouble}</p></div></div>
+        <div className="row"><span className="no">05</span><div><b>私だから入れられる経験</b><p>{r.strength}</p></div></div>
+      </section>
+
+      <h2 className="sec">🌱 あなたの商品のタネ</h2>
+      <p className="hint">たとえば、こんな商品が作れます。あなたの経験に近いものを、思い浮かべながら読んでみてください。</p>
+      {r.seeds.map((s, i) => (
+        <article className="seed" key={i}>
+          <h3>{s.title}</h3>
+          <dl>
+            <dt>どんな商品？</dt><dd>{s.what}</dd>
+            <dt>こんな人が探しています</dt><dd>{s.who}</dd>
+            <dt>お金を払ってでも欲しい理由</dt><dd>{s.why}</dd>
+            <dt>中身の例</dt><dd>{s.inside}</dd>
+            <dt>あなただから入れられること</dt><dd>{s.you}</dd>
+          </dl>
+          {s.note && <p className="seednote">※{s.note}</p>}
+        </article>
+      ))}
+
+      <section className="why">
+        <h3>「メモでいいじゃん」で終わらない商品の条件</h3>
+        <ol>
+          <li><b>困りごとが大きい</b>：仕事・お金・時間・気持ちのつらさがかかっている</li>
+          <li><b>自分で調べると何か月もかかる</b>：その近道になる</li>
+          <li><b>経験した人にしか書けない</b>：実例や本音が入っている</li>
+        </ol>
+        <p>上のタネは、この3つがそろうように選んでいます。</p>
+      </section>
+
+      <p className="pace">⏰ {r.pace}</p>
+
+      <section className="next">
+        <h3>このタネを、本命の商品にするまで</h3>
+        <div className="step"><span>1</span><p>まずは教材で、再販権つきの商品を使って「作って売る」流れをひと通り経験する</p></div>
+        <div className="step"><span>2</span><p>その経験と、あなたのタネを組み合わせて、本命の商品へ</p></div>
+        <p className="nexttext">
+          いきなり本命から作ると、売り方が分からずに止まってしまいがち。
+          先に「作って売る」を1回経験しておくと、2つ目からは迷いが減ります。
+        </p>
+        <a className="cta" href={NOTE_URL} target="_blank" rel="noopener noreferrer">
+          noteで教材を見てみる
+          <small>無料部分で9割読めます</small>
+        </a>
+      </section>
+
+      <h2 className="sec">結果を画像で保存する</h2>
+      <div className="imgwrap">{img ? <img src={img} alt="私の商品カルテ（ミニ版）" /> : <p className="loading">画像を作っています…</p>}</div>
       <div className="actions">
-        <button className="primary" disabled={!items || !!busy} onClick={savePng}>{busy === 'png' ? '作成中…' : '画像で保存'}</button>
-        <button className="primary" disabled={!items || !!busy} onClick={savePdf}>{busy === 'pdf' ? '作成中…' : 'PDFで保存'}</button>
+        <button className="primary" disabled={!img || busy} onClick={save}>{busy ? '作成中…' : '画像で保存'}</button>
         <button className="ghost" onClick={onRestart}>もう一度やる</button>
       </div>
       {msg && <p className="msg">{msg}</p>}
-      <button className="link" onClick={showImage} disabled={!items}>保存できないときは（画像を表示して長押しで保存）</button>
-      <a className="ig" href={IG_URL} target="_blank" rel="noopener noreferrer">ハルコンテンツをフォローする</a>
+      <button className="link" onClick={() => setPreview(true)} disabled={!img}>保存できないときは（画像を表示して長押しで保存）</button>
+
+      <a className="sub" href={THREADS_URL} target="_blank" rel="noopener noreferrer">Threadsでハルの「迷子の日々」を見る</a>
       <p className="disclaimer">
-        このマップは適職や収入を診断・予測するものではなく、これからを考えるためのヒントです。
-        {result.showLicenseNote && (
-          <>
-            <br />
-            ※すでにあるデジタルコンテンツを使う場合は、販売や編集できる範囲が商品ごとの契約で異なります。必ず条件をご確認ください。
-          </>
-        )}
+        この診断は、商品づくりを考えるためのヒントです。適職や収入を診断・予測するものではなく、売れることを約束するものでもありません。
+        医療・税金・子どもの心などに関わるテーマは、専門家の判断にかわるものではない「わが家の記録」として扱ってください。
       </p>
       {preview && (
-        <div className="modal" onClick={() => setPreview('')}>
+        <div className="modal" onClick={() => setPreview(false)}>
           <p>画像を長押しして「写真に追加」などで保存できます。タップで閉じます。</p>
-          <img src={preview} alt="未来チートマップ" />
+          <img src={img} alt="私の商品カルテ（ミニ版）" />
         </div>
       )}
     </main>
