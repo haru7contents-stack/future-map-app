@@ -181,6 +181,7 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
       <p className="hint">たとえば、こんな商品が作れます。あなたの経験に近いものを、思い浮かべながら読んでみてください。</p>
       {r.seeds.map((s, i) => (
         <article className="seed" key={i}>
+          <span className="seedno">タネの例{'①②③'[i]}</span>
           <h3>{s.title}</h3>
           <dl>
             <dt>どんな商品？</dt><dd>{s.what}</dd>
@@ -194,13 +195,13 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
       ))}
 
       <section className="why">
-        <h3>「メモでいいじゃん」で終わらない商品の条件</h3>
+        <h3>お金を払ってでも「欲しい」と思われる、3つの理由</h3>
         <ol>
-          <li><b>困りごとが大きい</b>：仕事・お金・時間・気持ちのつらさがかかっている</li>
-          <li><b>自分で調べると何か月もかかる</b>：その近道になる</li>
-          <li><b>経験した人にしか書けない</b>：実例や本音が入っている</li>
+          <li><b>困りごとが大きいから</b>：仕事・お金・時間・気持ちのつらさがかかっている</li>
+          <li><b>自分で調べると、何か月もかかるから</b>：その近道になる</li>
+          <li><b>経験した人にしか書けないから</b>：実例や本音が入っている</li>
         </ol>
-        <p>上のタネは、この3つがそろうように選んでいます。</p>
+        <p>上のタネの例は、この3つがそろうように選んでいます。</p>
       </section>
 
       <p className="pace">⏰ {r.pace}</p>

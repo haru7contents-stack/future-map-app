@@ -4,7 +4,7 @@ import { Result } from './generate'
 const W = 1080
 const H = 1350
 const FONT = '"Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif'
-const C = { bg: '#fbf6ea', box: '#ffffff', sage: '#8fa88a', pink: '#d98b93', brown: '#4a3a30', beige: '#efe3cf' }
+const C = { bg: '#fbf6ea', box: '#ffffff', sage: '#8fa88a', orange: '#c8702a', brown: '#4a3a30', beige: '#efe3cf' }
 
 export async function loadFonts() {
   await Promise.all([
@@ -98,7 +98,7 @@ export async function renderCard(r: Result, scale = 1): Promise<HTMLCanvasElemen
     const bh = 84 + n * 52
     roundRect(g, X, y, IW, bh, 24, C.box)
     g.font = `700 28px ${FONT}`
-    g.fillStyle = C.pink
+    g.fillStyle = C.orange
     g.fillText(`${no}  ${head}`, X + 36, y + 28)
     para(g, body, X + 36, y + 72, IW - 72, 36, 52, 500, C.brown, maxLines)
     y += bh + 22
