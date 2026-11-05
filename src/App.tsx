@@ -40,6 +40,7 @@ function Start({ onStart }: { onStart: () => void }) {
       <img className="haru hero" src={IMG('ikeru')} alt="" />
       <p className="eyebrow">「私に売れるものなんてない」と思っている人へ</p>
       <h1>私の商品のタネ診断</h1>
+      <p className="badge-wrap"><span className="badge">かんたんお試し版</span></p>
       <p className="by">by ハル（haru7_contents）</p>
       <p className="lead">
         6つの質問に答えると、あなたの経験から生まれる「商品のタネ」と、
@@ -50,7 +51,7 @@ function Start({ onStart }: { onStart: () => void }) {
         あなたにとって当たり前の経験が、誰かにとっては「知りたかったこと」かもしれません。
       </p>
       <ul className="notes">
-        <li>選ぶだけ・約2分</li>
+        <li>選ぶだけ・約2分の、かんたんお試し版です</li>
         <li>結果は「私の商品カルテ（ミニ版）」として画像で保存できます</li>
         <li>ログイン不要・無料</li>
       </ul>
@@ -173,13 +174,18 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
       <h2 className="done">あなたの商品カルテ（ミニ版）ができました</h2>
 
       <section className="karte">
-        <div className="row"><span className="no">01</span><div><b>私はこんな人</b><p>{r.me}</p></div></div>
-        <div className="row"><span className="no">02</span><div><b>届けたい人</b><p>{r.target}<br />いちばんの困りごと：{r.trouble}</p></div></div>
-        <div className="row"><span className="no">05</span><div><b>私だから入れられる経験</b><p>{r.strength}</p></div></div>
+        <Row no="01" head="私はこんな人" body={r.me} />
+        <Row no="02" head="届けたい人" body={r.target} />
+        <Row no="03" head="その人の困りごと" body={r.trouble} />
+        <Row no="04" head="その人に、どうなってほしいか" />
+        <Row no="05" head="私だから入れられる経験" body={r.strength} />
+        <Row no="06" head="大切にしたい考え" />
+        <Row no="07" head="私らしい言葉・雰囲気" />
+        <Row no="08" head="商品の方向性" />
       </section>
       <p className="mini-note">
-        ※これは選ぶだけの「ミニ版」です。コンテンツの中の本物の商品カルテでは、AIがあなたに質問しながら、
-        あなた自身の言葉で01〜08の8項目を仕上げていきます。
+        🔒の項目は、コンテンツの中で、AIがあなたに質問しながら、あなた自身の言葉で仕上げていきます。
+        この診断は、選ぶだけの「お試し版」です。
       </p>
 
       <h2 className="sec">🌱 あなたの商品のタネ</h2>
@@ -267,5 +273,17 @@ function SeedCard({ s, tag }: { s: Seed; tag: string }) {
       </dl>
       {s.note && <p className="seednote">※{s.note}</p>}
     </article>
+  )
+}
+
+function Row({ no, head, body }: { no: string; head: string; body?: string }) {
+  return (
+    <div className={`row${body ? '' : ' locked'}`}>
+      <span className="no">{body ? no : '🔒'}</span>
+      <div>
+        <b>{body ? '' : `${no} `}{head}</b>
+        <p>{body ?? 'コンテンツの中で、AIと一緒に仕上げます'}</p>
+      </div>
+    </div>
   )
 }

@@ -110,3 +110,9 @@ button { font-family: inherit; }
 .seed .seedno { display: inline-block; font-size: 13px; font-weight: 700; color: #fff; background: var(--orange); border-radius: 12px; padding: 2px 12px; margin-bottom: 8px; }
 .mini-note { font-size: 13px; opacity: .85; margin: 10px 4px 0; }
 .seedgroup { font-size: 14px; font-weight: 700; color: var(--choco); margin: 12px 0 0; }
+.karte .row.locked { opacity: .55; }
+.karte .row.locked .no { background: var(--beige); font-size: 15px; }
+.karte .row.locked b { color: var(--brown); }
+.karte .row.locked p { font-size: 13px; }
+.badge-wrap { text-align: center; margin: 2px 0 6px; }
+.badge { display: inline-block; font-size: 13px; font-weight: 700; color: var(--choco); border: 2px solid var(--choco); border-radius: 14px; padding: 1px 12px; }
