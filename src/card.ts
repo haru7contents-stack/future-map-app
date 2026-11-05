@@ -54,8 +54,18 @@ function roundRect(g: CanvasRenderingContext2D, x: number, y: number, w: number,
   g.fill()
 }
 
+function loadImage(src: string): Promise<HTMLImageElement | null> {
+  return new Promise((res) => {
+    const img = new Image()
+    img.onload = () => res(img)
+    img.onerror = () => res(null)
+    img.src = src
+  })
+}
+
 export async function renderCard(r: Result, scale = 1): Promise<HTMLCanvasElement> {
   await loadFonts()
+  const haru = await loadImage(`${import.meta.env.BASE_URL}images/haru/dekita.png`)
   const c = document.createElement('canvas')
   c.width = W * scale
   c.height = H * scale
@@ -75,6 +85,11 @@ export async function renderCard(r: Result, scale = 1): Promise<HTMLCanvasElemen
   g.fillStyle = C.brown
   g.fillText('私の商品カルテ（ミニ版）', W / 2, 118)
   g.textAlign = 'left'
+  if (haru) {
+    const ih = 170
+    const iw = (haru.width / haru.height) * ih
+    g.drawImage(haru, W - X - iw + 30, 30, iw, ih)
+  }
 
   let y = 220
   const block = (no: string, head: string, body: string, maxLines: number) => {

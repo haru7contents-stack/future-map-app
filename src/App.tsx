@@ -5,6 +5,8 @@ import { canvasToBlob, renderCard, saveBlob } from './card'
 
 const NOTE_URL = 'https://note.com/haru7contents/n/n8b9f0244629b'
 const THREADS_URL = 'https://www.threads.com/@haru7_contents'
+const IMG = (name: string) => `${import.meta.env.BASE_URL}images/haru/${name}.png`
+const ASK_IMG = ['maigo', 'maigo', 'kizuki', 'kizuki', 'dekisou', 'dekisou']
 
 type Screen = 'start' | number | 'result'
 
@@ -34,6 +36,7 @@ export default function App() {
 function Start({ onStart }: { onStart: () => void }) {
   return (
     <main className="card start">
+      <img className="haru hero" src={IMG('ikeru')} alt="" />
       <p className="eyebrow">「私に売れるものなんてない」と思っている人へ</p>
       <h1>私の商品のタネ診断</h1>
       <p className="by">by ハル（haru7_contents）</p>
@@ -93,7 +96,10 @@ function Ask({ idx, ans, setAns, go }: { idx: number; ans: Answers; setAns: (a: 
     <main className="card">
       <div className="progress-label">質問 {idx + 1} / {QUESTIONS.length}</div>
       <div className="bar"><div style={{ width: `${((idx + 1) / QUESTIONS.length) * 100}%` }} /></div>
-      <h2>{q.title}</h2>
+      <div className="qhead">
+        <h2>{q.title}</h2>
+        <img className="haru qimg" src={IMG(ASK_IMG[idx] ?? 'maigo')} alt="" />
+      </div>
       {q.hint && <p className="hint">{q.hint}</p>}
       <div className="options" role={q.multi ? 'group' : 'radiogroup'}>
         {q.options.map((o) => {
@@ -162,6 +168,7 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
 
   return (
     <main className="result">
+      <img className="haru hero" src={IMG('dekita')} alt="" />
       <h2 className="done">あなたの商品カルテ（ミニ版）ができました</h2>
 
       <section className="karte">
@@ -199,6 +206,7 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
       <p className="pace">⏰ {r.pace}</p>
 
       <section className="next">
+        <img className="haru step-img" src={IMG('tsugi')} alt="" />
         <h3>このタネを、本命の商品にするまで</h3>
         <div className="step"><span>1</span><p>まずは教材で、再販権つきの商品を使って「作って売る」流れをひと通り経験する</p></div>
         <div className="step"><span>2</span><p>その経験と、あなたのタネを組み合わせて、本命の商品へ</p></div>
@@ -221,6 +229,7 @@ function Result({ ans, onRestart }: { ans: Answers; onRestart: () => void }) {
       {msg && <p className="msg">{msg}</p>}
       <button className="link" onClick={() => setPreview(true)} disabled={!img}>保存できないときは（画像を表示して長押しで保存）</button>
 
+      <img className="haru hero small" src={IMG('yobikake')} alt="" />
       <a className="sub" href={THREADS_URL} target="_blank" rel="noopener noreferrer">Threadsでハルの「迷子の日々」を見る</a>
       <p className="disclaimer">
         この診断は、商品づくりを考えるためのヒントです。適職や収入を診断・予測するものではなく、売れることを約束するものでもありません。
